@@ -11,21 +11,17 @@ from groq import Groq
 from pydantic import BaseModel
 
 load_dotenv()
-my_api_key=os.getenv("GROQ_API_KEY")
-if not my_api_key:
-    raise ValueError("API key kothai??")
+my_api_key = os.getenv("GROQ_API_KEY")
 
-client = Groq(api_key=my_api_key)
-model="openai/gpt-oss-120b"
+client = Groq(api_key=my_api_key) if my_api_key else None
+model = "openai/gpt-oss-120b"
 
+app = FastAPI()
 
-
-app=FastAPI()
-
-# Allow requests from the React dev server
+# Allow requests from any origin (local & deployed frontend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5000", "http://127.0.0.1:5000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,7 +33,11 @@ _cached_resume_text = None
 def get_resume_text():
     global _cached_resume_text
     if _cached_resume_text is None:
-        _cached_resume_text = read_pdf(Path("Sweta.pdf"))
+        pdf_path = Path(__file__).parent / "Sweta.pdf"
+        if pdf_path.exists():
+            _cached_resume_text = read_pdf(pdf_path)
+        else:
+            _cached_resume_text = ""
     return _cached_resume_text
 
 #parse resume
@@ -64,6 +64,9 @@ class ChatRequest(BaseModel):
     question: str
 
 def ask_candidate(question: str, resume_text: str):
+    if not client:
+        return "GROQ_API_KEY is not configured in the server environment variables."
+    
     system_prompt = f"""
     You are an AI assistant representing a job candidate named Sweta Mondal.
     Below is her complete resume. Use ALL the details to answer questions accurately.
@@ -79,14 +82,25 @@ def ask_candidate(question: str, resume_text: str):
     4. Be professional, concise, and helpful.
     5. When describing projects, include tech stack, features, and key achievements.
     """
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": question}
-        ]
-    )
-    return response.choices[0].message.content
+    
+    models_to_try = [model, "llama-3.1-8b-instant", "llama3-70b-8192", "llama3-8b-8192"]
+    last_err = None
+
+    for m in models_to_try:
+        try:
+            response = client.chat.completions.create(
+                model=m,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question}
+                ]
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            last_err = str(e)
+            continue
+            
+    return f"AI service temporarily unavailable: {last_err}"
 
 def parse_resume(resume_text):
     system_prompt=f"""
