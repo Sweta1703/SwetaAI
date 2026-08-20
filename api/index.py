@@ -92,10 +92,12 @@ Rules:
     return f"AI service temporarily unavailable. Error: {last_err}"
 
 @app.get("/")
+@app.get("/api")
 def home():
     return {"message": "HiremeAI Backend is Running!"}
 
 @app.post("/chat")
+@app.post("/api/chat")
 def chat(request: ChatRequest):
     try:
         resume_text = get_resume_text()

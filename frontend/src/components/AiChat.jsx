@@ -108,7 +108,7 @@ export default function AiChat() {
         {
           id: Date.now() + 1,
           role: 'ai',
-          content: `⚠️ Could not reach the AI backend. Please make sure the server is running at **localhost:8000**.`,
+          content: `⚠️ Something went wrong. Please try again in a moment. *(${err.message})*`,
           time: formatTime(),
         },
       ]);
