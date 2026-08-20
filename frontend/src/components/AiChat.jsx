@@ -89,7 +89,7 @@ export default function AiChat() {
 
     setIsTyping(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://swetaai-i2xy.onrender.com';
+      const backendUrl = (import.meta.env.VITE_BACKEND_URL || 'https://swetaai-i2xy.onrender.com').replace(/\/$/, '');
       const res = await fetch(`${backendUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
