@@ -108,7 +108,7 @@ export default function AiChat() {
         {
           id: Date.now() + 1,
           role: 'ai',
-          content: `⚠️ Something went wrong. Please try again in a moment. *(${err.message})*`,
+          content: `⚠️ Could not reach the AI backend. Please make sure the server is running at **localhost:8000**.`,
           time: formatTime(),
         },
       ]);
@@ -171,8 +171,8 @@ export default function AiChat() {
                 )}
                 <div
                   className={`px-4 py-3 rounded-xl text-sm leading-relaxed max-w-[80%] ${msg.role === 'ai'
-                      ? 'bg-white/[0.04] border border-white/[0.07] text-[#f0f0f8]'
-                      : 'bg-cyan-400/[0.08] border border-cyan-400/20 text-[#f0f0f8]'
+                    ? 'bg-white/[0.04] border border-white/[0.07] text-[#f0f0f8]'
+                    : 'bg-cyan-400/[0.08] border border-cyan-400/20 text-[#f0f0f8]'
                     }`}
                 >
                   {msg.role === 'ai' ? (
