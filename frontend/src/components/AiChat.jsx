@@ -89,9 +89,8 @@ export default function AiChat() {
 
     setIsTyping(true);
     try {
-      const backendUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
-      const endpoint = backendUrl ? `${backendUrl}/chat` : '/api/chat';
-      const res = await fetch(endpoint, {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://swetaai-i2xy.onrender.com';
+      const res = await fetch(`${backendUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: trimmed }),
