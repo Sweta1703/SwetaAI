@@ -89,7 +89,9 @@ export default function AiChat() {
 
     setIsTyping(true);
     try {
-      const res = await fetch('/api/chat', {
+      const backendUrl = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
+      const endpoint = backendUrl ? `${backendUrl}/chat` : '/api/chat';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: trimmed }),
